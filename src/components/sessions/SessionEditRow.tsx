@@ -53,13 +53,15 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
     <li className="space-y-2 rounded-xl border border-amber-300/60 bg-amber-50 p-3 dark:border-amber-800/60 dark:bg-amber-950/30">
       <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{book?.name ?? 'Serbest okuma'}</p>
       {showDate && (
-        <input
-          type="date"
-          value={date}
-          max={todayDateStr()}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-        />
+        <div className="w-full overflow-hidden rounded-lg border border-zinc-300 dark:border-zinc-600 dark:bg-zinc-800">
+          <input
+            type="date"
+            value={date}
+            max={todayDateStr()}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full min-w-0 border-0 bg-transparent px-2 py-1.5 text-sm dark:text-white"
+          />
+        </div>
       )}
       {book ? (
         <div className="grid grid-cols-2 gap-2">
