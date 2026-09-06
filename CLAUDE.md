@@ -32,6 +32,7 @@ Two project-scoped subagents exist at `.claude/agents/` (`kitap-takip-dev`, `kit
 - **ReadingSession**: `id, bookId?, date (YYYY-MM-DD), startTime?, endTime?, startPage?, endPage?, pageCount?, note?, createdAt`.
   - `bookId` is **optional**: undefined means a "serbest okuma" (free reading) record not tied to any book — uses `pageCount` instead of `startPage`/`endPage`. Do not model this as a separate pseudo-book (that design was built once and explicitly reverted — see git history around "Serbest Okuma kitabı yerine gerçek serbest okuma kaydı").
   - `pagesRead` (computed): `endPage - startPage` when `bookId` is set, else `pageCount`.
+  - `startTime`/`endTime` still exist in the schema and are displayed if present, but `SessionForm.tsx` (the "Yeni kayıt" add form) no longer collects them — native `<input type="time">` on iOS Safari doesn't respect its container width and repeatedly broke mobile layout (overlapping/overflowing boxes) across several fix attempts. Don't re-add time inputs to that form without testing on real iOS Safari first.
 
 ## Business rules that must not regress
 
@@ -39,7 +40,15 @@ Two project-scoped subagents exist at `.claude/agents/` (`kitap-takip-dev`, `kit
 - `frontMatterPages`/`pageCount`/etc. can legitimately be `0` — never use `value || fallback` patterns on them (that treats a valid `0` as unset); this has bitten the codebase before.
 - After adding/editing/deleting a session, `db/sessions.ts: recomputeBookCurrentPage` re-sorts that book's sessions chronologically (`utils/sessionOrder.ts`) and sets `currentPage` to the last one's `endPage`. If a book has zero sessions left, `currentPage` is left untouched (don't reset it — that would silently discard a manual correction).
 - Any Firestore write in `src/firebase/sync.ts` must go through `stripUndefined` (JSON round-trip) first — Firestore's `setDoc` throws on `undefined` field values, and `ReadingSession`'s optional fields are frequently `undefined`.
-- `startCloudSync`'s echo-loop guard (`lastSynced` serialized-string comparison) must stay intact when touching sync — without it, local writes and remote snapshots can re-trigger each other.
+- `startCloudSync`'s echo-loop guard (`lastSynced` serialized-string comparison) must stay intact when touching sync. It also tracks a `hasPendingLocalChange` flag: an incoming remote snapshot is skipped (not applied) while a local change is still debounced/unpushed, so a same-device edit isn't clobbered by `applyCloudToLocal`'s full clear+bulkAdd. Don't remove either guard.
+- `db/backup.ts: importBackup` treats the uploaded file as fully untrusted input: `isValidBookEntry`/`isValidSessionEntry` validate every field's type before it touches Dexie (a prior version only checked that `books`/`sessions` were arrays). Book de-duplication on import matches on name **and** `totalPages`/`frontMatterPages` together (`bookMatchKey`) — matching on name alone previously merged two different books that happened to share a title.
+- `BookForm.tsx` blocks saving an edited book if the new page range would no longer cover that book's existing sessions (`db/sessions.ts: getBookSessionPageBounds`) — prevents silently leaving historical sessions outside the book's valid range.
+
+## Visual design
+
+Minimal/neutral design system: `zinc` (not `slate`) is the neutral palette, `amber` is the *only* accent color and is used sparingly (the big page-count numbers on Home/MonthlySummary, the active bottom-nav dot, the session-edit highlight) — don't reintroduce `indigo`/`slate` or add other accent colors without reason. Body font is Inter, big numbers/headings use the `.font-display` class (Fraunces, loaded via Google Fonts in `index.html`). `Card` (`components/ui/Card.tsx`) has no shadow by design (border-only, generous padding) — that's intentional, not a missed style.
+
+Settings has an "Uygulamayı yenile" (hard refresh) button: PWA mode has no accessible browser refresh, so it clears service-worker caches and unregisters the SW before reloading. Keep this working if touching the SW/PWA config.
 
 ## Cloud sync flow (when Firebase is configured)
 
