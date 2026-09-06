@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { BookWithComputed, SessionWithComputed } from '../../types'
-import { deleteSession, updateSession } from '../../db/sessions'
-import { validateSessionPages } from '../../db/validation'
+import { deleteSession } from '../../db/sessions'
+import { SessionEditRow } from '../sessions/SessionEditRow'
 
 interface TodaySessionListProps {
   sessions: SessionWithComputed[]
@@ -22,12 +22,7 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
         if (!book) return null
 
         return editingId === session.id ? (
-          <EditRow
-            key={session.id}
-            session={session}
-            book={book}
-            onDone={() => setEditingId(null)}
-          />
+          <SessionEditRow key={session.id} session={session} book={book} onDone={() => setEditingId(null)} />
         ) : (
           <li
             key={session.id}
@@ -72,76 +67,5 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
         )
       })}
     </ul>
-  )
-}
-
-function EditRow({
-  session,
-  book,
-  onDone,
-}: {
-  session: SessionWithComputed
-  book: BookWithComputed
-  onDone: () => void
-}) {
-  const [startPage, setStartPage] = useState(String(session.startPage))
-  const [endPage, setEndPage] = useState(String(session.endPage))
-  const [note, setNote] = useState(session.note ?? '')
-  const [error, setError] = useState<string | null>(null)
-
-  async function handleSave() {
-    const start = Number(startPage)
-    const end = Number(endPage)
-    const validationError = validateSessionPages(book, start, end)
-    if (validationError) {
-      setError(validationError)
-      return
-    }
-    await updateSession(session.id, { startPage: start, endPage: end, note: note.trim() || undefined })
-    onDone()
-  }
-
-  return (
-    <li className="space-y-2 rounded-xl border border-indigo-300 bg-indigo-50 p-3 dark:border-indigo-700 dark:bg-indigo-950">
-      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{book.name}</p>
-      <div className="grid grid-cols-2 gap-2">
-        <input
-          type="number"
-          value={startPage}
-          onChange={(e) => setStartPage(e.target.value)}
-          className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-        />
-        <input
-          type="number"
-          value={endPage}
-          onChange={(e) => setEndPage(e.target.value)}
-          className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-        />
-      </div>
-      <input
-        type="text"
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        placeholder="Not"
-        className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-      />
-      {error && <p className="text-xs font-medium text-red-600 dark:text-red-400">{error}</p>}
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={handleSave}
-          className="flex-1 rounded-lg bg-indigo-600 py-1.5 text-sm font-semibold text-white"
-        >
-          Kaydet
-        </button>
-        <button
-          type="button"
-          onClick={onDone}
-          className="flex-1 rounded-lg border border-slate-300 py-1.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300"
-        >
-          İptal
-        </button>
-      </div>
-    </li>
   )
 }

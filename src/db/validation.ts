@@ -17,6 +17,10 @@ export function validateSessionPages(book: Book, startPage: number, endPage: num
   if (endPage <= startPage) {
     return 'Bitiş sayfası, başlangıç sayfasından büyük olmalı.'
   }
+  const startingPage = book.frontMatterPages + 1
+  if (startPage < startingPage) {
+    return `Başlangıç sayfası, kitabın okumaya başladığı sayfadan (${startingPage}) küçük olamaz. Önsöz/giriş sayfaları okumaya dahil edilmez.`
+  }
   if (endPage > book.totalPages) {
     return `Bitiş sayfası kitabın toplam sayfa sayısını (${book.totalPages}) geçemez.`
   }

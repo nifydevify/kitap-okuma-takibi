@@ -7,6 +7,7 @@ import { dateStrLabel } from '../../utils/date'
 import { Card } from '../ui/Card'
 import { ProgressBar } from '../ui/ProgressBar'
 import { BookForm } from '../books/BookForm'
+import { SessionEditRow } from '../sessions/SessionEditRow'
 
 interface BookDetailProps {
   bookId: number
@@ -19,6 +20,7 @@ export function BookDetail({ bookId, onBack }: BookDetailProps) {
   const [editingCurrentPage, setEditingCurrentPage] = useState(false)
   const [currentPageInput, setCurrentPageInput] = useState('')
   const [editingBook, setEditingBook] = useState(false)
+  const [editingSessionId, setEditingSessionId] = useState<number | null>(null)
 
   if (!book) {
     return (
@@ -140,34 +142,53 @@ export function BookDetail({ bookId, onBack }: BookDetailProps) {
         {sessions.length === 0 ? (
           <p className="text-sm text-slate-500 dark:text-slate-400">Bu kitap için henüz kayıt yok.</p>
         ) : (
-          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
-            {sessions.map((session) => (
-              <li key={session.id} className="flex items-center justify-between gap-2 py-2 text-sm">
-                <div className="min-w-0">
-                  <p className="text-slate-700 dark:text-slate-200">
-                    {dateStrLabel(session.date)}
-                    {session.startTime ? ` · ${session.startTime}` : ''}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {session.startPage} → {session.endPage} · {session.pagesRead} sayfa
-                  </p>
-                  {session.note && (
-                    <p className="truncate text-xs italic text-slate-400 dark:text-slate-500">{session.note}</p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm('Bu kaydı silmek istediğine emin misin?')) {
-                      void deleteSession(session.id)
-                    }
-                  }}
-                  className="shrink-0 text-xs font-medium text-red-600 dark:text-red-400"
-                >
-                  Sil
-                </button>
-              </li>
-            ))}
+          <ul className="space-y-2 divide-y divide-slate-100 dark:divide-slate-700">
+            {sessions.map((session) =>
+              editingSessionId === session.id ? (
+                <SessionEditRow
+                  key={session.id}
+                  session={session}
+                  book={book}
+                  showDate
+                  onDone={() => setEditingSessionId(null)}
+                />
+              ) : (
+                <li key={session.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+                  <div className="min-w-0">
+                    <p className="text-slate-700 dark:text-slate-200">
+                      {dateStrLabel(session.date)}
+                      {session.startTime ? ` · ${session.startTime}` : ''}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {session.startPage} → {session.endPage} · {session.pagesRead} sayfa
+                    </p>
+                    {session.note && (
+                      <p className="truncate text-xs italic text-slate-400 dark:text-slate-500">{session.note}</p>
+                    )}
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingSessionId(session.id)}
+                      className="text-xs font-medium text-indigo-600 dark:text-indigo-400"
+                    >
+                      Düzenle
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm('Bu kaydı silmek istediğine emin misin?')) {
+                          void deleteSession(session.id)
+                        }
+                      }}
+                      className="text-xs font-medium text-red-600 dark:text-red-400"
+                    >
+                      Sil
+                    </button>
+                  </div>
+                </li>
+              ),
+            )}
           </ul>
         )}
       </Card>
