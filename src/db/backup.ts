@@ -1,6 +1,6 @@
 import { db } from './db'
 import { recomputeBookCurrentPage } from './sessions'
-import type { BackupData, Book } from '../types'
+import type { BackupData, Book, ReadingSession } from '../types'
 
 export async function exportBackup(): Promise<BackupData> {
   const [books, sessions] = await Promise.all([db.books.toArray(), db.sessions.toArray()])
@@ -30,6 +30,44 @@ function isBackupData(value: unknown): value is BackupData {
   return Array.isArray(candidate.books) && Array.isArray(candidate.sessions)
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
+/**
+ * Kullanıcının yüklediği yedek dosyası tamamen güvenilmez girdidir; isBackupData sadece dizilerin
+ * varlığını kontrol eder, alan tiplerini değil. Bozuk bir kitap (ör. totalPages: "abc") kontrolsüz
+ * geçerse hesaplamalarda sessizce NaN üretir ve Firestore senkronizasyonuna sızar — bu yüzden her
+ * kitap/oturum burada alan bazında doğrulanıp geçersiz olanlar atlanır.
+ */
+function isValidBookEntry(value: unknown): value is Book {
+  if (!value || typeof value !== 'object') return false
+  const b = value as Partial<Book>
+  return (
+    isFiniteNumber(b.id) &&
+    typeof b.name === 'string' &&
+    isFiniteNumber(b.totalPages) &&
+    isFiniteNumber(b.frontMatterPages) &&
+    typeof b.color === 'string' &&
+    isFiniteNumber(b.currentPage)
+  )
+}
+
+function isValidSessionEntry(value: unknown): value is ReadingSession {
+  if (!value || typeof value !== 'object') return false
+  const s = value as Partial<ReadingSession>
+  if (!isFiniteNumber(s.id) || typeof s.date !== 'string') return false
+  if (s.bookId !== undefined && !isFiniteNumber(s.bookId)) return false
+  if (s.startTime !== undefined && typeof s.startTime !== 'string') return false
+  if (s.endTime !== undefined && typeof s.endTime !== 'string') return false
+  if (s.startPage !== undefined && !isFiniteNumber(s.startPage)) return false
+  if (s.endPage !== undefined && !isFiniteNumber(s.endPage)) return false
+  if (s.pageCount !== undefined && !isFiniteNumber(s.pageCount)) return false
+  if (s.note !== undefined && typeof s.note !== 'string') return false
+  if (s.createdAt !== undefined && !isFiniteNumber(s.createdAt)) return false
+  return true
+}
+
 /**
  * Aynı yedeğin tekrar içe aktarılmasında kitabı yinelememek için eşleştirme anahtarı.
  * Sadece isme bakmak, aynı isimli ama farklı iki kitabı (ör. iki farklı "Sözler" kaydı)
@@ -52,13 +90,16 @@ export async function importBackup(json: string): Promise<{ addedBooks: number; 
     throw new Error('Geçersiz yedek dosyası.')
   }
 
+  const validBooks = parsed.books.filter(isValidBookEntry)
+  const validSessions = parsed.sessions.filter(isValidSessionEntry)
+
   return db.transaction('rw', db.books, db.sessions, async () => {
     const existingBooks = await db.books.toArray()
     const nameToId = new Map(existingBooks.map((b) => [bookMatchKey(b), b.id]))
     const oldIdToNewId = new Map<number, number>()
     let addedBooks = 0
 
-    for (const book of parsed.books) {
+    for (const book of validBooks) {
       const key = bookMatchKey(book)
       const existingId = nameToId.get(key)
       if (existingId !== undefined) {
@@ -78,7 +119,7 @@ export async function importBackup(json: string): Promise<{ addedBooks: number; 
     }
 
     let addedSessions = 0
-    for (const session of parsed.sessions) {
+    for (const session of validSessions) {
       // Serbest okuma kaydı (bookId yok): doğrudan aktar, kitap eşleştirmesi gerekmez.
       const bookId = session.bookId === undefined ? undefined : oldIdToNewId.get(session.bookId)
       if (session.bookId !== undefined && bookId === undefined) continue

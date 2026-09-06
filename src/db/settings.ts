@@ -1,4 +1,15 @@
 import { db } from './db'
+import type { AppSettings } from '../types'
+
+/**
+ * db.settings.update() satır yoksa sessizce hiçbir şey yapmaz (Dexie'de update no-op döner).
+ * Normalde 'settings' satırı populate hook'uyla garanti var, ama silinmiş/bozulmuş olsa bile
+ * ayar değişikliğinin sessizce kaybolmaması için get+put ile upsert yapıyoruz.
+ */
+async function upsertSettings(changes: Partial<Omit<AppSettings, 'id'>>): Promise<void> {
+  const existing = await db.settings.get('settings')
+  await db.settings.put({ id: 'settings', darkMode: false, ...existing, ...changes })
+}
 
 export async function getDarkMode(): Promise<boolean> {
   const settings = await db.settings.get('settings')
@@ -6,7 +17,7 @@ export async function getDarkMode(): Promise<boolean> {
 }
 
 export async function setDarkMode(darkMode: boolean): Promise<void> {
-  await db.settings.update('settings', { darkMode })
+  await upsertSettings({ darkMode })
 }
 
 export async function getCloudSyncAccount(): Promise<string | undefined> {
@@ -15,7 +26,7 @@ export async function getCloudSyncAccount(): Promise<string | undefined> {
 }
 
 export async function setCloudSyncAccount(uid: string | undefined): Promise<void> {
-  await db.settings.update('settings', { cloudSyncAccount: uid })
+  await upsertSettings({ cloudSyncAccount: uid })
 }
 
 /** Tüm kitapları ve kayıtları kalıcı olarak siler; kitap listesi tamamen boş kalır (yeniden tohumlanmaz). */
