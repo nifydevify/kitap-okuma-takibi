@@ -20,6 +20,7 @@ interface BookFormProps {
 }
 
 export function BookForm({ book, onDone }: BookFormProps) {
+  const isFreeform = book?.isFreeform ?? false
   const [name, setName] = useState(book?.name ?? '')
   const [startPage, setStartPage] = useState(book ? String(book.frontMatterPages + 1) : '1')
   const [endPage, setEndPage] = useState(book ? String(book.totalPages || '') : '')
@@ -33,6 +34,17 @@ export function BookForm({ book, onDone }: BookFormProps) {
 
     if (!name.trim()) {
       setError('Kitap adı boş olamaz.')
+      return
+    }
+
+    if (isFreeform) {
+      setSaving(true)
+      try {
+        await updateBook(book!.id, { name: name.trim(), color })
+        onDone()
+      } finally {
+        setSaving(false)
+      }
       return
     }
 
@@ -80,34 +92,40 @@ export function BookForm({ book, onDone }: BookFormProps) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Başlangıç sayfası
-          </label>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={startPage}
-            onChange={(e) => setStartPage(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-          />
-          <p className="mt-1 text-xs text-slate-400">Önsöz/giriş varsa asıl metnin başladığı sayfa</p>
+      {isFreeform ? (
+        <p className="text-xs text-slate-400">
+          Serbest Okuma kitabında sayfa aralığı yoktur; kayıtlar sadece toplam sayfa sayacını artırır.
+        </p>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Başlangıç sayfası
+            </label>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={startPage}
+              onChange={(e) => setStartPage(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            />
+            <p className="mt-1 text-xs text-slate-400">Önsöz/giriş varsa asıl metnin başladığı sayfa</p>
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Bitiş sayfası
+            </label>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={endPage}
+              onChange={(e) => setEndPage(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            />
+            <p className="mt-1 text-xs text-slate-400">Kitabın bittiği son sayfa</p>
+          </div>
         </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Bitiş sayfası
-          </label>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={endPage}
-            onChange={(e) => setEndPage(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-          />
-          <p className="mt-1 text-xs text-slate-400">Kitabın bittiği son sayfa</p>
-        </div>
-      </div>
+      )}
 
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Renk</label>

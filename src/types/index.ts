@@ -5,6 +5,8 @@ export interface Book {
   frontMatterPages: number
   color: string
   currentPage: number
+  /** true ise: belirli bir kitaba bağlı olmayan, sadece kümülatif sayfa sayacı tutulan özel kitap. */
+  isFreeform?: boolean
 }
 
 export interface BookWithComputed extends Book {

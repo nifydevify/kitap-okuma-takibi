@@ -16,13 +16,19 @@ export function BookCard({ book, onOpen, onEdit, onDelete }: BookCardProps) {
       <button type="button" onClick={onOpen} className="block w-full text-left">
         <div className="mb-2 flex items-center justify-between">
           <span className="font-semibold text-slate-800 dark:text-slate-100">{book.name}</span>
-          {hasPages && (
-            <span className="text-sm text-slate-500 dark:text-slate-400">
-              {book.progressPages}/{book.effectivePages} (%{book.progressPercent.toFixed(0)})
-            </span>
+          {book.isFreeform ? (
+            <span className="text-sm text-slate-500 dark:text-slate-400">{book.progressPages} sayfa</span>
+          ) : (
+            hasPages && (
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {book.progressPages}/{book.effectivePages} (%{book.progressPercent.toFixed(0)})
+              </span>
+            )
           )}
         </div>
-        {hasPages ? (
+        {book.isFreeform ? (
+          <p className="text-sm text-slate-400">Belirli bir kitaba bağlı olmayan okumalar için sayaç</p>
+        ) : hasPages ? (
           <ProgressBar percent={book.progressPercent} color={book.color} />
         ) : (
           <p className="text-sm text-amber-600 dark:text-amber-400">Başlangıç/bitiş sayfası girilmedi</p>

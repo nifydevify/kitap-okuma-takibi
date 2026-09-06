@@ -11,11 +11,15 @@ export function validateSessionPages(book: Book, startPage: number, endPage: num
   if (!Number.isFinite(startPage) || !Number.isFinite(endPage)) {
     return 'Sayfa alanları geçerli bir sayı olmalı.'
   }
-  if (book.totalPages <= 0) {
-    return 'Önce bu kitabın başlangıç/bitiş sayfasını girmelisin (Kitaplarım veya kitap detay ekranından).'
-  }
   if (endPage <= startPage) {
     return 'Bitiş sayfası, başlangıç sayfasından büyük olmalı.'
+  }
+  // Serbest Okuma kitabının sayfa aralığı/toplam sayfa zorunluluğu yoktur, sadece sayaç olarak artar.
+  if (book.isFreeform) {
+    return null
+  }
+  if (book.totalPages <= 0) {
+    return 'Önce bu kitabın başlangıç/bitiş sayfasını girmelisin (Kitaplarım veya kitap detay ekranından).'
   }
   const startingPage = book.frontMatterPages + 1
   if (startPage < startingPage) {
