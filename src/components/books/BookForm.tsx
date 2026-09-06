@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Book } from '../../types'
 import { addBook, updateBook } from '../../db/books'
+import { getBookSessionPageBounds } from '../../db/sessions'
 import { validatePageCount } from '../../db/validation'
 
 const COLOR_OPTIONS = [
@@ -22,7 +23,7 @@ interface BookFormProps {
 export function BookForm({ book, onDone }: BookFormProps) {
   const [name, setName] = useState(book?.name ?? '')
   const [startPage, setStartPage] = useState(book ? String(book.frontMatterPages + 1) : '1')
-  const [endPage, setEndPage] = useState(book ? String(book.totalPages || '') : '')
+  const [endPage, setEndPage] = useState(book ? String(book.totalPages) : '')
   const [color, setColor] = useState(book?.color ?? COLOR_OPTIONS[0])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -54,6 +55,16 @@ export function BookForm({ book, onDone }: BookFormProps) {
     }
 
     const frontMatterPages = start - 1
+
+    if (book) {
+      const bounds = await getBookSessionPageBounds(book.id)
+      if (bounds && (start > bounds.minStart || end < bounds.maxEnd)) {
+        setError(
+          `Bu kitapta ${bounds.minStart}-${bounds.maxEnd} aralığında kayıtlı oturumlar var; yeni sayfa aralığı bu aralığı kapsamalı.`,
+        )
+        return
+      }
+    }
 
     setSaving(true)
     try {

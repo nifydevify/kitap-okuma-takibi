@@ -56,12 +56,25 @@ export function startCloudSync(uid: string): Unsubscribe {
   let lastSynced: string | null = null
   let applyingRemote = false
   let pushTimer: ReturnType<typeof setTimeout> | undefined
+  // schedulePush çağrıldıktan sonra pushIfChanged tamamlanana kadar true kalır. Bu pencerede
+  // henüz buluta yazılmamış bir yerel değişiklik var demektir; bu sırada gelen bir uzak anlık
+  // görüntüyü uygulamak (tam silme+yeniden yazma) o yerel değişikliği sessizce kaybeder — bu yüzden
+  // bekleyen push'un önce yerelde kazanmasına izin verip uzak görüntüyü şimdilik atlıyoruz.
+  let hasPendingLocalChange = false
+
+  // Bu cihaz senkronizasyona bir push (chooseDevice) veya applyCloudToLocal (chooseCloud) sonrası
+  // başlıyor; ilk onSnapshot genelde tam olarak yerelle aynı veriyi getirir. lastSynced'i baştan
+  // yerel anlık görüntüyle eşleştirmek, o durumda gereksiz bir clear+bulkAdd (ve UI flicker'ı) önler.
+  void readLocalSnapshot().then((local) => {
+    if (lastSynced === null) lastSynced = serialize(local)
+  })
 
   const unsubscribeRemote = onSnapshot(userDocRef(uid), (snap) => {
     if (!snap.exists()) return
     const data = snap.data() as BackupData
     const serialized = serialize(data)
     if (serialized === lastSynced) return
+    if (hasPendingLocalChange) return
     lastSynced = serialized
     applyingRemote = true
     void applyCloudToLocal(data).finally(() => {
@@ -73,12 +86,14 @@ export function startCloudSync(uid: string): Unsubscribe {
     if (applyingRemote) return
     const data = await readLocalSnapshot()
     const serialized = serialize(data)
+    hasPendingLocalChange = false
     if (serialized === lastSynced) return
     lastSynced = serialized
     await setDoc(userDocRef(uid), stripUndefined(data))
   }
 
   function schedulePush() {
+    hasPendingLocalChange = true
     if (pushTimer) clearTimeout(pushTimer)
     pushTimer = setTimeout(() => void pushIfChanged(), 1500)
   }

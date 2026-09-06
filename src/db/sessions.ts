@@ -41,6 +41,20 @@ export async function updateSession(id: number, changes: Partial<NewSessionInput
   })
 }
 
+/** Bir kitaba bağlı oturumların kapladığı en dar sayfa aralığı (sayfaya bağlı olmayanlar hariç). */
+export async function getBookSessionPageBounds(bookId: number): Promise<{ minStart: number; maxEnd: number } | null> {
+  const sessions = await db.sessions.where('bookId').equals(bookId).toArray()
+  const withPages = sessions.filter(
+    (s): s is ReadingSession & { startPage: number; endPage: number } =>
+      s.startPage !== undefined && s.endPage !== undefined,
+  )
+  if (withPages.length === 0) return null
+  return {
+    minStart: Math.min(...withPages.map((s) => s.startPage)),
+    maxEnd: Math.max(...withPages.map((s) => s.endPage)),
+  }
+}
+
 export async function deleteSession(id: number): Promise<void> {
   await db.transaction('rw', db.books, db.sessions, async () => {
     const existing = await db.sessions.get(id)

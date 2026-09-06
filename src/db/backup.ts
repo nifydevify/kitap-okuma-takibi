@@ -1,6 +1,6 @@
 import { db } from './db'
 import { recomputeBookCurrentPage } from './sessions'
-import type { BackupData } from '../types'
+import type { BackupData, Book } from '../types'
 
 export async function exportBackup(): Promise<BackupData> {
   const [books, sessions] = await Promise.all([db.books.toArray(), db.sessions.toArray()])
@@ -31,9 +31,20 @@ function isBackupData(value: unknown): value is BackupData {
 }
 
 /**
+ * Aynı yedeğin tekrar içe aktarılmasında kitabı yinelememek için eşleştirme anahtarı.
+ * Sadece isme bakmak, aynı isimli ama farklı iki kitabı (ör. iki farklı "Sözler" kaydı)
+ * yanlışlıkla birleştirebiliyordu; sayfa alanlarını da anahtara katmak bu riski azaltır —
+ * gerçek bir yeniden içe aktarımda tüm alanlar zaten birebir eşleşir.
+ */
+function bookMatchKey(book: Pick<Book, 'name' | 'totalPages' | 'frontMatterPages'>): string {
+  return `${book.name.trim().toLowerCase()}|${book.totalPages}|${book.frontMatterPages}`
+}
+
+/**
  * İçe aktarılan veriyi mevcut veriyle birleştirir (üzerine yazmaz).
- * Aynı isimdeki kitaplar eşleştirilip mevcut kayıt kullanılır; diğerleri yeni kitap olarak eklenir.
- * Oturumlar her zaman yeni kayıt olarak eklenir, bookId eşleşen (yeni veya mevcut) kitaba yeniden bağlanır.
+ * Aynı isim+sayfa aralığına sahip kitaplar eşleştirilip mevcut kayıt kullanılır; diğerleri yeni
+ * kitap olarak eklenir. Oturumlar her zaman yeni kayıt olarak eklenir, bookId eşleşen (yeni veya
+ * mevcut) kitaba yeniden bağlanır.
  */
 export async function importBackup(json: string): Promise<{ addedBooks: number; addedSessions: number }> {
   const parsed: unknown = JSON.parse(json)
@@ -43,12 +54,12 @@ export async function importBackup(json: string): Promise<{ addedBooks: number; 
 
   return db.transaction('rw', db.books, db.sessions, async () => {
     const existingBooks = await db.books.toArray()
-    const nameToId = new Map(existingBooks.map((b) => [b.name.trim().toLowerCase(), b.id]))
+    const nameToId = new Map(existingBooks.map((b) => [bookMatchKey(b), b.id]))
     const oldIdToNewId = new Map<number, number>()
     let addedBooks = 0
 
     for (const book of parsed.books) {
-      const key = book.name.trim().toLowerCase()
+      const key = bookMatchKey(book)
       const existingId = nameToId.get(key)
       if (existingId !== undefined) {
         oldIdToNewId.set(book.id, existingId)
