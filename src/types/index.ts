@@ -5,8 +5,6 @@ export interface Book {
   frontMatterPages: number
   color: string
   currentPage: number
-  /** true ise: belirli bir kitaba bağlı olmayan, sadece kümülatif sayfa sayacı tutulan özel kitap. */
-  isFreeform?: boolean
 }
 
 export interface BookWithComputed extends Book {
@@ -19,12 +17,16 @@ export interface BookWithComputed extends Book {
 
 export interface ReadingSession {
   id: number
-  bookId: number
+  /** undefined ise: belirli bir kitaba bağlı olmayan serbest okuma kaydı. */
+  bookId?: number
   date: string // YYYY-MM-DD
   startTime?: string // HH:mm
   endTime?: string // HH:mm
-  startPage: number
-  endPage: number
+  /** Sadece bookId doluyken kullanılır (kitabın gerçek sayfa numaraları). */
+  startPage?: number
+  endPage?: number
+  /** Sadece bookId boşken (serbest kayıt) kullanılır: doğrudan girilen sayfa sayısı. */
+  pageCount?: number
   note?: string
   createdAt: number
 }

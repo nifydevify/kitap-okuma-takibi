@@ -18,10 +18,11 @@ export function withBookComputed(book: Book): BookWithComputed {
 }
 
 export function withSessionComputed(session: ReadingSession): SessionWithComputed {
-  return {
-    ...session,
-    pagesRead: session.endPage - session.startPage,
-  }
+  const pagesRead =
+    session.bookId !== undefined
+      ? (session.endPage ?? 0) - (session.startPage ?? 0)
+      : (session.pageCount ?? 0)
+  return { ...session, pagesRead }
 }
 
 export function startingPageOf(book: Pick<Book, 'frontMatterPages'>): number {

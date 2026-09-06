@@ -68,11 +68,7 @@ export function BookDetail({ bookId, onBack }: BookDetailProps) {
             </button>
           </div>
 
-          {book.isFreeform ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Toplam okunan: <strong className="text-slate-800 dark:text-slate-100">{book.progressPages}</strong> sayfa
-            </p>
-          ) : book.totalPages > 0 ? (
+          {book.totalPages > 0 ? (
             <>
               <ProgressBar percent={book.progressPercent} color={book.color} size="lg" />
               <div className="mt-2 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">

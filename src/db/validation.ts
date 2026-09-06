@@ -14,10 +14,6 @@ export function validateSessionPages(book: Book, startPage: number, endPage: num
   if (endPage <= startPage) {
     return 'Bitiş sayfası, başlangıç sayfasından büyük olmalı.'
   }
-  // Serbest Okuma kitabının sayfa aralığı/toplam sayfa zorunluluğu yoktur, sadece sayaç olarak artar.
-  if (book.isFreeform) {
-    return null
-  }
   if (book.totalPages <= 0) {
     return 'Önce bu kitabın başlangıç/bitiş sayfasını girmelisin (Kitaplarım veya kitap detay ekranından).'
   }
@@ -27,6 +23,28 @@ export function validateSessionPages(book: Book, startPage: number, endPage: num
   }
   if (endPage > book.totalPages) {
     return `Bitiş sayfası kitabın toplam sayfa sayısını (${book.totalPages}) geçemez.`
+  }
+  return null
+}
+
+/** Belirli bir kitaba bağlı olmayan serbest okuma kaydı: doğrudan sayfa sayısı girilen mod. */
+export function validateFreeSessionCount(count: number): string | null {
+  if (!Number.isFinite(count) || count <= 0) {
+    return 'Sayfa sayısı 0’dan büyük bir sayı olmalı.'
+  }
+  return null
+}
+
+/** Belirli bir kitaba bağlı olmayan serbest okuma kaydı: başlangıç/bitiş sayfasından hesaplama modu. */
+export function validateFreeSessionRange(startPage: number, endPage: number): string | null {
+  if (!Number.isFinite(startPage) || !Number.isFinite(endPage)) {
+    return 'Sayfa alanları geçerli bir sayı olmalı.'
+  }
+  if (startPage < 0) {
+    return 'Başlangıç sayfası negatif olamaz.'
+  }
+  if (endPage <= startPage) {
+    return 'Bitiş sayfası, başlangıç sayfasından büyük olmalı.'
   }
   return null
 }

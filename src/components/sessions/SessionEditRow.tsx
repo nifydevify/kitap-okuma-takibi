@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import type { BookWithComputed, SessionWithComputed } from '../../types'
 import { updateSession } from '../../db/sessions'
-import { validateSessionPages } from '../../db/validation'
+import { validateFreeSessionCount, validateSessionPages } from '../../db/validation'
 import { todayDateStr } from '../../utils/date'
 
 interface SessionEditRowProps {
   session: SessionWithComputed
-  book: BookWithComputed
+  /** undefined ise: belirli bir kitaba bağlı olmayan serbest okuma kaydı. */
+  book: BookWithComputed | undefined
   onDone: () => void
   /** Tarih alanını da göster (kitap detayındaki geçmiş gibi birden çok günü kapsayan listelerde kullanılır). */
   showDate?: boolean
@@ -14,26 +15,43 @@ interface SessionEditRowProps {
 
 export function SessionEditRow({ session, book, onDone, showDate = false }: SessionEditRowProps) {
   const [date, setDate] = useState(session.date)
-  const [startPage, setStartPage] = useState(String(session.startPage))
-  const [endPage, setEndPage] = useState(String(session.endPage))
+  const [startPage, setStartPage] = useState(String(session.startPage ?? ''))
+  const [endPage, setEndPage] = useState(String(session.endPage ?? ''))
+  const [pageCount, setPageCount] = useState(String(session.pagesRead))
   const [note, setNote] = useState(session.note ?? '')
   const [error, setError] = useState<string | null>(null)
 
   async function handleSave() {
-    const start = Number(startPage)
-    const end = Number(endPage)
-    const validationError = validateSessionPages(book, start, end)
-    if (validationError) {
-      setError(validationError)
-      return
+    if (book) {
+      const start = Number(startPage)
+      const end = Number(endPage)
+      const validationError = validateSessionPages(book, start, end)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+      await updateSession(session.id, { date, startPage: start, endPage: end, note: note.trim() || undefined })
+    } else {
+      const count = Number(pageCount)
+      const validationError = validateFreeSessionCount(count)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+      await updateSession(session.id, {
+        date,
+        pageCount: count,
+        startPage: undefined,
+        endPage: undefined,
+        note: note.trim() || undefined,
+      })
     }
-    await updateSession(session.id, { date, startPage: start, endPage: end, note: note.trim() || undefined })
     onDone()
   }
 
   return (
     <li className="space-y-2 rounded-xl border border-indigo-300 bg-indigo-50 p-3 dark:border-indigo-700 dark:bg-indigo-950">
-      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{book.name}</p>
+      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{book?.name ?? 'Serbest okuma'}</p>
       {showDate && (
         <input
           type="date"
@@ -43,20 +61,30 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
           className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
         />
       )}
-      <div className="grid grid-cols-2 gap-2">
+      {book ? (
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            value={startPage}
+            onChange={(e) => setStartPage(e.target.value)}
+            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          />
+          <input
+            type="number"
+            value={endPage}
+            onChange={(e) => setEndPage(e.target.value)}
+            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          />
+        </div>
+      ) : (
         <input
           type="number"
-          value={startPage}
-          onChange={(e) => setStartPage(e.target.value)}
-          className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          value={pageCount}
+          onChange={(e) => setPageCount(e.target.value)}
+          placeholder="Kaç sayfa"
+          className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
         />
-        <input
-          type="number"
-          value={endPage}
-          onChange={(e) => setEndPage(e.target.value)}
-          className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-        />
-      </div>
+      )}
       <input
         type="text"
         value={note}

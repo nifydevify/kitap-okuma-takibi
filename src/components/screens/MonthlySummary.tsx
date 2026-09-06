@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import type { BookWithComputed } from '../../types'
 import { useBooks } from '../../hooks/useBooks'
 import { useSessionsForMonth } from '../../hooks/useSessions'
 import { currentMonthKey, daysInMonthKey, monthKeyLabel, shiftMonthKey, shortDateLabel } from '../../utils/date'
@@ -14,13 +15,21 @@ export function MonthlySummary() {
 
   const perBook = useMemo(() => {
     const map = new Map<number, number>()
+    let freePages = 0
     for (const session of sessions) {
-      map.set(session.bookId, (map.get(session.bookId) ?? 0) + session.pagesRead)
+      if (session.bookId === undefined) {
+        freePages += session.pagesRead
+      } else {
+        map.set(session.bookId, (map.get(session.bookId) ?? 0) + session.pagesRead)
+      }
     }
-    return books
+    const rows: { book: BookWithComputed | null; pages: number }[] = books
       .map((book) => ({ book, pages: map.get(book.id) ?? 0 }))
       .filter((row) => row.pages > 0)
-      .sort((a, b) => b.pages - a.pages)
+    if (freePages > 0) {
+      rows.push({ book: null, pages: freePages })
+    }
+    return rows.sort((a, b) => b.pages - a.pages)
   }, [books, sessions])
 
   const dailyTotals = useMemo(() => {
@@ -99,14 +108,17 @@ export function MonthlySummary() {
             </thead>
             <tbody>
               {perBook.map(({ book, pages }) => (
-                <tr key={book.id} className="border-t border-slate-100 dark:border-slate-700">
+                <tr key={book?.id ?? 'free'} className="border-t border-slate-100 dark:border-slate-700">
                   <td className="flex items-center gap-2 py-2 text-slate-700 dark:text-slate-200">
-                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: book.color }} />
-                    {book.name}
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: book?.color ?? '#64748b' }}
+                    />
+                    {book?.name ?? 'Serbest okuma'}
                   </td>
                   <td className="py-2 text-right text-slate-700 dark:text-slate-200">{pages}</td>
                   <td className="py-2 text-right text-slate-500 dark:text-slate-400">
-                    {book.effectivePages > 0 ? `%${((pages / book.effectivePages) * 100).toFixed(1)}` : '—'}
+                    {book && book.effectivePages > 0 ? `%${((pages / book.effectivePages) * 100).toFixed(1)}` : '—'}
                   </td>
                 </tr>
               ))}

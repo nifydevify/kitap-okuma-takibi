@@ -18,8 +18,8 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
   return (
     <ul className="space-y-2">
       {sessions.map((session) => {
-        const book = books.find((b) => b.id === session.bookId)
-        if (!book) return null
+        const book = session.bookId !== undefined ? books.find((b) => b.id === session.bookId) : undefined
+        if (session.bookId !== undefined && !book) return null
 
         return editingId === session.id ? (
           <SessionEditRow key={session.id} session={session} book={book} onDone={() => setEditingId(null)} />
@@ -30,13 +30,17 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
           >
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: book.color }}
+              style={{ backgroundColor: book?.color ?? '#64748b' }}
               aria-hidden
             />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{book.name}</p>
+              <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
+                {book?.name ?? 'Serbest okuma'}
+              </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {session.startPage} → {session.endPage} · {session.pagesRead} sayfa
+                {book
+                  ? `${session.startPage} → ${session.endPage} · ${session.pagesRead} sayfa`
+                  : `${session.pagesRead} sayfa`}
                 {session.startTime ? ` · ${session.startTime}${session.endTime ? `–${session.endTime}` : ''}` : ''}
               </p>
               {session.note && (

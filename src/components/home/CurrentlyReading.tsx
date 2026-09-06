@@ -6,7 +6,7 @@ interface CurrentlyReadingProps {
 }
 
 export function CurrentlyReading({ books }: CurrentlyReadingProps) {
-  const reading = books.filter((b) => !b.isFreeform && b.progressPages > 0 && b.progressPercent < 100)
+  const reading = books.filter((b) => b.progressPages > 0 && b.progressPercent < 100)
 
   if (reading.length === 0) {
     return <p className="text-sm text-slate-500 dark:text-slate-400">Henüz okumaya başlanan kitap yok.</p>

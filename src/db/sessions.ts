@@ -15,6 +15,7 @@ export async function recomputeBookCurrentPage(bookId: number): Promise<void> {
 
   const sorted = [...sessions].sort(compareSessionsChronological)
   const last = sorted[sorted.length - 1]
+  if (last.endPage === undefined) return
 
   await db.books.update(bookId, { currentPage: last.endPage })
 }
@@ -22,7 +23,7 @@ export async function recomputeBookCurrentPage(bookId: number): Promise<void> {
 export async function addSession(input: NewSessionInput): Promise<number> {
   return db.transaction('rw', db.books, db.sessions, async () => {
     const id = await db.sessions.add({ ...input, createdAt: Date.now() })
-    await recomputeBookCurrentPage(input.bookId)
+    if (input.bookId !== undefined) await recomputeBookCurrentPage(input.bookId)
     return id
   })
 }
@@ -32,8 +33,9 @@ export async function updateSession(id: number, changes: Partial<NewSessionInput
     const existing = await db.sessions.get(id)
     if (!existing) return
     await db.sessions.update(id, changes)
-    await recomputeBookCurrentPage(changes.bookId ?? existing.bookId)
-    if (changes.bookId && changes.bookId !== existing.bookId) {
+    const newBookId = 'bookId' in changes ? changes.bookId : existing.bookId
+    if (newBookId !== undefined) await recomputeBookCurrentPage(newBookId)
+    if (existing.bookId !== undefined && existing.bookId !== newBookId) {
       await recomputeBookCurrentPage(existing.bookId)
     }
   })
@@ -44,6 +46,6 @@ export async function deleteSession(id: number): Promise<void> {
     const existing = await db.sessions.get(id)
     if (!existing) return
     await db.sessions.delete(id)
-    await recomputeBookCurrentPage(existing.bookId)
+    if (existing.bookId !== undefined) await recomputeBookCurrentPage(existing.bookId)
   })
 }

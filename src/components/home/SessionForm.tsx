@@ -1,21 +1,35 @@
 import { useState } from 'react'
 import type { BookWithComputed } from '../../types'
 import { addSession } from '../../db/sessions'
-import { validateSessionPages } from '../../db/validation'
+import { validateFreeSessionCount, validateFreeSessionRange, validateSessionPages } from '../../db/validation'
 import { todayDateStr } from '../../utils/date'
 
 interface SessionFormProps {
   books: BookWithComputed[]
 }
 
+type Mode = 'book' | 'free'
+type FreeEntryMode = 'range' | 'count'
+
 export function SessionForm({ books }: SessionFormProps) {
+  const [mode, setMode] = useState<Mode>(books.length > 0 ? 'book' : 'free')
+
+  // Kitaba bağlı mod
   // books IndexedDB'den asenkron yüklenir (ilk render'da []), bu yüzden seçim ve
   // başlangıç sayfası render sırasında books'tan türetilir; "henüz seçilmedi" durumu
   // ayrı state ile tutulmaz, bu da books geldiğinde senkron setState gerektirmez.
   const [explicitBookId, setExplicitBookId] = useState<number | null>(null)
-  const [date, setDate] = useState(todayDateStr())
   const [startPageOverride, setStartPageOverride] = useState<string | null>(null)
   const [endPage, setEndPage] = useState('')
+
+  // Serbest okuma modu
+  const [freeEntryMode, setFreeEntryMode] = useState<FreeEntryMode>('range')
+  const [freeStartPage, setFreeStartPage] = useState('')
+  const [freeEndPage, setFreeEndPage] = useState('')
+  const [freePageCount, setFreePageCount] = useState('')
+
+  // Ortak alanlar
+  const [date, setDate] = useState(todayDateStr())
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [note, setNote] = useState('')
@@ -32,68 +46,233 @@ export function SessionForm({ books }: SessionFormProps) {
     setError(null)
   }
 
+  function resetCommonFields() {
+    setStartTime('')
+    setEndTime('')
+    setNote('')
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
 
-    if (!selectedBook) {
-      setError('Lütfen bir kitap seç.')
+    if (mode === 'book') {
+      if (!selectedBook) {
+        setError('Lütfen bir kitap seç.')
+        return
+      }
+      const start = Number(startPage)
+      const end = Number(endPage)
+      const validationError = validateSessionPages(selectedBook, start, end)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+
+      setSaving(true)
+      try {
+        await addSession({
+          bookId: selectedBook.id,
+          date,
+          startTime: startTime || undefined,
+          endTime: endTime || undefined,
+          startPage: start,
+          endPage: end,
+          note: note.trim() || undefined,
+        })
+        setEndPage('')
+        resetCommonFields()
+        setStartPageOverride(String(end))
+      } finally {
+        setSaving(false)
+      }
       return
     }
 
-    const start = Number(startPage)
-    const end = Number(endPage)
-    const validationError = validateSessionPages(selectedBook, start, end)
-    if (validationError) {
-      setError(validationError)
-      return
+    // Serbest okuma
+    let pageCount: number
+    if (freeEntryMode === 'count') {
+      pageCount = Number(freePageCount)
+      const validationError = validateFreeSessionCount(pageCount)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+    } else {
+      const start = Number(freeStartPage)
+      const end = Number(freeEndPage)
+      const validationError = validateFreeSessionRange(start, end)
+      if (validationError) {
+        setError(validationError)
+        return
+      }
+      pageCount = end - start
     }
 
     setSaving(true)
     try {
       await addSession({
-        bookId: selectedBook.id,
         date,
         startTime: startTime || undefined,
         endTime: endTime || undefined,
-        startPage: start,
-        endPage: end,
+        pageCount,
         note: note.trim() || undefined,
       })
-      setEndPage('')
-      setStartTime('')
-      setEndTime('')
-      setNote('')
-      setStartPageOverride(String(end))
+      setFreeStartPage('')
+      setFreeEndPage('')
+      setFreePageCount('')
+      resetCommonFields()
     } finally {
       setSaving(false)
     }
   }
 
-  if (books.length === 0) {
-    return (
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        Kayıt eklemeden önce Kitaplarım sekmesinden bir kitap ekle.
-      </p>
-    )
-  }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Kitap</label>
-        <select
-          value={bookId}
-          onChange={(e) => handleBookChange(Number(e.target.value))}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+      <div className="flex rounded-xl bg-slate-100 p-1 dark:bg-slate-700/50">
+        <button
+          type="button"
+          onClick={() => setMode('book')}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            mode === 'book'
+              ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-800 dark:text-indigo-400'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
         >
-          {books.map((book) => (
-            <option key={book.id} value={book.id}>
-              {book.name}
-            </option>
-          ))}
-        </select>
+          Kitaba bağlı
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('free')}
+          className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
+            mode === 'free'
+              ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-800 dark:text-indigo-400'
+              : 'text-slate-500 dark:text-slate-400'
+          }`}
+        >
+          Serbest okuma
+        </button>
       </div>
+
+      {mode === 'book' ? (
+        books.length === 0 ? (
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Kitaba bağlı kayıt eklemeden önce Kitaplarım sekmesinden bir kitap ekle. Bağımsız bir okuma için
+            "Serbest okuma" sekmesini kullanabilirsin.
+          </p>
+        ) : (
+          <>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Kitap</label>
+              <select
+                value={bookId}
+                onChange={(e) => handleBookChange(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              >
+                {books.map((book) => (
+                  <option key={book.id} value={book.id}>
+                    {book.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Başlangıç sayfası
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={startPage}
+                  onChange={(e) => setStartPageOverride(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Bitiş sayfası
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={endPage}
+                  onChange={(e) => setEndPage(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  placeholder="ör. 50"
+                />
+              </div>
+            </div>
+          </>
+        )
+      ) : (
+        <>
+          <div className="flex gap-4 text-sm">
+            <label className="flex items-center gap-1.5">
+              <input
+                type="radio"
+                checked={freeEntryMode === 'range'}
+                onChange={() => setFreeEntryMode('range')}
+              />
+              Sayfa aralığından hesapla
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input
+                type="radio"
+                checked={freeEntryMode === 'count'}
+                onChange={() => setFreeEntryMode('count')}
+              />
+              Direkt sayfa sayısı gir
+            </label>
+          </div>
+
+          {freeEntryMode === 'range' ? (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Başlangıç sayfası
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={freeStartPage}
+                  onChange={(e) => setFreeStartPage(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  placeholder="ör. 21"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Bitiş sayfası
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  value={freeEndPage}
+                  onChange={(e) => setFreeEndPage(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  placeholder="ör. 35"
+                />
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Kaç sayfa okudun?
+              </label>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={freePageCount}
+                onChange={(e) => setFreePageCount(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                placeholder="ör. 14"
+              />
+            </div>
+          )}
+        </>
+      )}
 
       <div>
         <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Tarih</label>
@@ -113,34 +292,6 @@ export function SessionForm({ books }: SessionFormProps) {
             Bugüne dön
           </button>
         )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Başlangıç sayfası
-          </label>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={startPage}
-            onChange={(e) => setStartPageOverride(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Bitiş sayfası
-          </label>
-          <input
-            type="number"
-            inputMode="numeric"
-            value={endPage}
-            onChange={(e) => setEndPage(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-            placeholder="ör. 50"
-          />
-        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -177,19 +328,21 @@ export function SessionForm({ books }: SessionFormProps) {
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-          placeholder="ör. Yirmi Üçüncü Söz"
+          placeholder={mode === 'free' ? 'ör. Falanca kitaptan' : 'ör. Yirmi Üçüncü Söz'}
         />
       </div>
 
       {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-xl bg-indigo-600 py-3 text-base font-semibold text-white transition-colors active:bg-indigo-700 disabled:opacity-60"
-      >
-        Kaydet
-      </button>
+      {!(mode === 'book' && books.length === 0) && (
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full rounded-xl bg-indigo-600 py-3 text-base font-semibold text-white transition-colors active:bg-indigo-700 disabled:opacity-60"
+        >
+          Kaydet
+        </button>
+      )}
     </form>
   )
 }

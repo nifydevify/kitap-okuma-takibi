@@ -68,8 +68,9 @@ export async function importBackup(json: string): Promise<{ addedBooks: number; 
 
     let addedSessions = 0
     for (const session of parsed.sessions) {
-      const bookId = oldIdToNewId.get(session.bookId)
-      if (bookId === undefined) continue
+      // Serbest okuma kaydı (bookId yok): doğrudan aktar, kitap eşleştirmesi gerekmez.
+      const bookId = session.bookId === undefined ? undefined : oldIdToNewId.get(session.bookId)
+      if (session.bookId !== undefined && bookId === undefined) continue
       await db.sessions.add({
         bookId,
         date: session.date,
@@ -77,6 +78,7 @@ export async function importBackup(json: string): Promise<{ addedBooks: number; 
         endTime: session.endTime,
         startPage: session.startPage,
         endPage: session.endPage,
+        pageCount: session.pageCount,
         note: session.note,
         createdAt: session.createdAt ?? Date.now(),
       })
