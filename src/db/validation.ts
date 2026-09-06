@@ -12,7 +12,7 @@ export function validateSessionPages(book: Book, startPage: number, endPage: num
     return 'Sayfa alanları geçerli bir sayı olmalı.'
   }
   if (book.totalPages <= 0) {
-    return 'Önce Kitaplarım sekmesinden bu kitabın toplam sayfa sayısını girmelisin.'
+    return 'Önce bu kitabın başlangıç/bitiş sayfasını girmelisin (Kitaplarım veya kitap detay ekranından).'
   }
   if (endPage <= startPage) {
     return 'Bitiş sayfası, başlangıç sayfasından büyük olmalı.'

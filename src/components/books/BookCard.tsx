@@ -25,7 +25,7 @@ export function BookCard({ book, onOpen, onEdit, onDelete }: BookCardProps) {
         {hasPages ? (
           <ProgressBar percent={book.progressPercent} color={book.color} />
         ) : (
-          <p className="text-sm text-amber-600 dark:text-amber-400">Toplam sayfa sayısı girilmedi</p>
+          <p className="text-sm text-amber-600 dark:text-amber-400">Başlangıç/bitiş sayfası girilmedi</p>
         )}
       </button>
       <div className="mt-3 flex gap-3 text-sm">
