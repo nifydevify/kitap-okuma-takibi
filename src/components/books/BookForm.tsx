@@ -21,8 +21,8 @@ interface BookFormProps {
 
 export function BookForm({ book, onDone }: BookFormProps) {
   const [name, setName] = useState(book?.name ?? '')
-  const [totalPages, setTotalPages] = useState(book ? String(book.totalPages || '') : '')
-  const [frontMatterPages, setFrontMatterPages] = useState(book ? String(book.frontMatterPages) : '0')
+  const [startPage, setStartPage] = useState(book ? String(book.frontMatterPages + 1) : '1')
+  const [endPage, setEndPage] = useState(book ? String(book.totalPages || '') : '')
   const [color, setColor] = useState(book?.color ?? COLOR_OPTIONS[0])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -36,29 +36,31 @@ export function BookForm({ book, onDone }: BookFormProps) {
       return
     }
 
-    const total = Number(totalPages)
-    const frontMatter = frontMatterPages === '' ? 0 : Number(frontMatterPages)
+    const start = Number(startPage)
+    const end = Number(endPage)
 
-    const pageError = validatePageCount(total)
+    if (!Number.isFinite(start) || start < 1) {
+      setError('Başlangıç sayfası 1 veya daha büyük olmalı.')
+      return
+    }
+    const pageError = validatePageCount(end)
     if (pageError) {
       setError(pageError)
       return
     }
-    if (!Number.isFinite(frontMatter) || frontMatter < 0) {
-      setError('Ön söz sayfa sayısı 0 veya daha büyük olmalı.')
+    if (start > end) {
+      setError('Başlangıç sayfası, bitiş sayfasından büyük olamaz.')
       return
     }
-    if (frontMatter >= total) {
-      setError('Ön söz sayfa sayısı, toplam sayfa sayısından küçük olmalı.')
-      return
-    }
+
+    const frontMatterPages = start - 1
 
     setSaving(true)
     try {
       if (book) {
-        await updateBook(book.id, { name: name.trim(), totalPages: total, frontMatterPages: frontMatter, color })
+        await updateBook(book.id, { name: name.trim(), totalPages: end, frontMatterPages, color })
       } else {
-        await addBook({ name: name.trim(), totalPages: total, frontMatterPages: frontMatter, color })
+        await addBook({ name: name.trim(), totalPages: end, frontMatterPages, color })
       }
       onDone()
     } finally {
@@ -81,27 +83,29 @@ export function BookForm({ book, onDone }: BookFormProps) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Toplam sayfa
+            Başlangıç sayfası
           </label>
           <input
             type="number"
             inputMode="numeric"
-            value={totalPages}
-            onChange={(e) => setTotalPages(e.target.value)}
+            value={startPage}
+            onChange={(e) => setStartPage(e.target.value)}
             className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
           />
+          <p className="mt-1 text-xs text-slate-400">Önsöz/giriş varsa asıl metnin başladığı sayfa</p>
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Ön söz sayfası
+            Bitiş sayfası
           </label>
           <input
             type="number"
             inputMode="numeric"
-            value={frontMatterPages}
-            onChange={(e) => setFrontMatterPages(e.target.value)}
+            value={endPage}
+            onChange={(e) => setEndPage(e.target.value)}
             className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
           />
+          <p className="mt-1 text-xs text-slate-400">Kitabın bittiği son sayfa</p>
         </div>
       </div>
 
