@@ -295,7 +295,7 @@ export function SessionForm({ books }: SessionFormProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="min-w-0">
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Başlangıç saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
           </label>
@@ -303,10 +303,10 @@ export function SessionForm({ books }: SessionFormProps) {
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            className="w-full min-w-0 rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
-        <div>
+        <div className="min-w-0">
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Bitiş saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
           </label>
@@ -314,7 +314,7 @@ export function SessionForm({ books }: SessionFormProps) {
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            className="w-full min-w-0 rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
       </div>
