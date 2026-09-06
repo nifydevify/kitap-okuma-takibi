@@ -20,9 +20,16 @@ async function readLocalSnapshot(): Promise<BackupData> {
   return { version: 1, exportedAt: new Date().toISOString(), books, sessions }
 }
 
+// Firestore, alan değeri olarak `undefined` kabul etmez (ör. ReadingSession.note/startTime/
+// endTime boşken undefined olur) ve setDoc'u hatayla reddeder. JSON round-trip, undefined
+// anahtarları tamamen kaldırdığı için en güvenli temizleme yolu budur.
+function stripUndefined<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data)) as T
+}
+
 export async function pushLocalToCloud(uid: string): Promise<void> {
   const data = await readLocalSnapshot()
-  await setDoc(userDocRef(uid), data)
+  await setDoc(userDocRef(uid), stripUndefined(data))
 }
 
 export async function applyCloudToLocal(data: BackupData): Promise<void> {
@@ -68,7 +75,7 @@ export function startCloudSync(uid: string): Unsubscribe {
     const serialized = serialize(data)
     if (serialized === lastSynced) return
     lastSynced = serialized
-    await setDoc(userDocRef(uid), data)
+    await setDoc(userDocRef(uid), stripUndefined(data))
   }
 
   function schedulePush() {

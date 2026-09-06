@@ -23,8 +23,10 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
     setBusy(true)
     try {
       await action()
-    } catch {
-      setError('Bir şeyler ters gitti, tekrar dene.')
+    } catch (err) {
+      console.error('Bulut senkronizasyonu hatası:', err)
+      const message = err instanceof Error ? err.message : String(err)
+      setError(`Bir şeyler ters gitti: ${message}`)
     } finally {
       setBusy(false)
     }
