@@ -13,7 +13,7 @@ export function Home() {
   const totalPagesToday = sessions.reduce((sum, s) => sum + s.pagesRead, 0)
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-6 py-4">
       <Card className="text-center">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500">
           Bugün okunan sayfa

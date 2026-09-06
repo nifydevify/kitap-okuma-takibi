@@ -54,7 +54,7 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-6 py-4">
       <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Ayarlar</h1>
 
       <Card className="space-y-3">

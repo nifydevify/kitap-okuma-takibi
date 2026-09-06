@@ -42,7 +42,7 @@ export function BookDetail({ bookId, onBack }: BookDetailProps) {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-6 py-4">
       <button type="button" onClick={onBack} className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
         ← Geri
       </button>

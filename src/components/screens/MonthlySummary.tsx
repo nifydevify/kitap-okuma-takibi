@@ -48,7 +48,7 @@ export function MonthlySummary() {
   )
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 px-6 py-4">
       <div className="flex items-center justify-between">
         <button
           type="button"
