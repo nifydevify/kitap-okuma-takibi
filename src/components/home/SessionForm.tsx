@@ -30,8 +30,6 @@ export function SessionForm({ books }: SessionFormProps) {
 
   // Ortak alanlar
   const [date, setDate] = useState(todayDateStr())
-  const [startTime, setStartTime] = useState('')
-  const [endTime, setEndTime] = useState('')
   const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -47,8 +45,6 @@ export function SessionForm({ books }: SessionFormProps) {
   }
 
   function resetCommonFields() {
-    setStartTime('')
-    setEndTime('')
     setNote('')
   }
 
@@ -74,8 +70,6 @@ export function SessionForm({ books }: SessionFormProps) {
         await addSession({
           bookId: selectedBook.id,
           date,
-          startTime: startTime || undefined,
-          endTime: endTime || undefined,
           startPage: start,
           endPage: end,
           note: note.trim() || undefined,
@@ -113,8 +107,6 @@ export function SessionForm({ books }: SessionFormProps) {
     try {
       await addSession({
         date,
-        startTime: startTime || undefined,
-        endTime: endTime || undefined,
         pageCount,
         note: note.trim() || undefined,
       })
@@ -292,31 +284,6 @@ export function SessionForm({ books }: SessionFormProps) {
             Bugüne dön
           </button>
         )}
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Başlangıç saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
-          </label>
-          <input
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Bitiş saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
-          </label>
-          <input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
-          />
-        </div>
       </div>
 
       <div>
