@@ -6,9 +6,11 @@ import { MyBooks } from './components/screens/MyBooks'
 import { BookDetail } from './components/screens/BookDetail'
 import { Settings } from './components/screens/Settings'
 import { useDarkMode } from './hooks/useDarkMode'
+import { useCloudSync } from './hooks/useCloudSync'
 
 function App() {
   useDarkMode()
+  const cloudSync = useCloudSync()
   const [tab, setTab] = useState<Tab>('home')
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null)
 
@@ -32,7 +34,7 @@ function App() {
         content = <MyBooks onOpenBook={setSelectedBookId} />
         break
       case 'settings':
-        content = <Settings />
+        content = <Settings cloudSync={cloudSync} />
         break
     }
   }

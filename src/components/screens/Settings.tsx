@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react'
 import { useDarkMode } from '../../hooks/useDarkMode'
+import type { CloudSync } from '../../hooks/useCloudSync'
 import { downloadBackup, importBackup } from '../../db/backup'
 import { resetAllData } from '../../db/settings'
 import { Card } from '../ui/Card'
+import { CloudSyncCard } from '../settings/CloudSyncCard'
 
-export function Settings() {
+export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
   const [darkMode, setDarkMode] = useDarkMode()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -36,6 +38,8 @@ export function Settings() {
   return (
     <div className="space-y-4 p-4">
       <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Ayarlar</h1>
+
+      <CloudSyncCard cloudSync={cloudSync} />
 
       <Card>
         <div className="flex items-center justify-between">

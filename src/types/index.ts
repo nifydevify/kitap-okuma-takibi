@@ -36,6 +36,8 @@ export interface SessionWithComputed extends ReadingSession {
 export interface AppSettings {
   id: 'settings'
   darkMode: boolean
+  /** Bu cihazın bulut senkronizasyonu için "cihaz mı bulut mu" seçimini hangi Google hesabı (uid) için yaptığı. */
+  cloudSyncAccount?: string
 }
 
 export interface BackupData {
