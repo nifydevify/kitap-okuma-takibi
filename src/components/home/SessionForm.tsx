@@ -13,6 +13,7 @@ export function SessionForm({ books }: SessionFormProps) {
   // başlangıç sayfası render sırasında books'tan türetilir; "henüz seçilmedi" durumu
   // ayrı state ile tutulmaz, bu da books geldiğinde senkron setState gerektirmez.
   const [explicitBookId, setExplicitBookId] = useState<number | null>(null)
+  const [date, setDate] = useState(todayDateStr())
   const [startPageOverride, setStartPageOverride] = useState<string | null>(null)
   const [endPage, setEndPage] = useState('')
   const [startTime, setStartTime] = useState('')
@@ -52,7 +53,7 @@ export function SessionForm({ books }: SessionFormProps) {
     try {
       await addSession({
         bookId: selectedBook.id,
-        date: todayDateStr(),
+        date,
         startTime: startTime || undefined,
         endTime: endTime || undefined,
         startPage: start,
@@ -92,6 +93,26 @@ export function SessionForm({ books }: SessionFormProps) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Tarih</label>
+        <input
+          type="date"
+          value={date}
+          max={todayDateStr()}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+        />
+        {date !== todayDateStr() && (
+          <button
+            type="button"
+            onClick={() => setDate(todayDateStr())}
+            className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400"
+          >
+            Bugüne dön
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
