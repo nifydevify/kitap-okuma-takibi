@@ -2,9 +2,12 @@ import { useState } from 'react'
 import type { CloudSync } from '../../hooks/useCloudSync'
 import { Card } from '../ui/Card'
 
+type BusyAction = 'signin' | 'device' | 'cloud' | 'signout' | null
+
 export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
-  const [busy, setBusy] = useState(false)
+  const [busyAction, setBusyAction] = useState<BusyAction>(null)
   const [error, setError] = useState<string | null>(null)
+  const busy = busyAction !== null
 
   if (cloudSync.status.kind === 'disabled') {
     return (
@@ -18,9 +21,9 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
     )
   }
 
-  async function run(action: () => Promise<void>) {
+  async function run(which: Exclude<BusyAction, null>, action: () => Promise<void>) {
     setError(null)
-    setBusy(true)
+    setBusyAction(which)
     try {
       await action()
     } catch (err) {
@@ -28,7 +31,7 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
       const message = err instanceof Error ? err.message : String(err)
       setError(`Bir şeyler ters gitti: ${message}`)
     } finally {
-      setBusy(false)
+      setBusyAction(null)
     }
   }
 
@@ -44,10 +47,10 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
         <button
           type="button"
           disabled={busy}
-          onClick={() => void run(cloudSync.signIn)}
+          onClick={() => void run('signin', cloudSync.signIn)}
           className="w-full rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
         >
-          Google ile giriş yap
+          {busyAction === 'signin' ? 'Bağlanılıyor…' : 'Google ile giriş yap'}
         </button>
         {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
       </Card>
@@ -69,22 +72,27 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
           <button
             type="button"
             disabled={busy}
-            onClick={() => void run(cloudSync.chooseDevice)}
+            onClick={() => void run('device', cloudSync.chooseDevice)}
             className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
           >
-            Bu cihazın verisini kullan
+            {busyAction === 'device' ? 'Yükleniyor…' : 'Bu cihazın verisini kullan'}
           </button>
           {cloudSync.status.cloudHasData && (
             <button
               type="button"
               disabled={busy}
-              onClick={() => void run(cloudSync.chooseCloud)}
+              onClick={() => void run('cloud', cloudSync.chooseCloud)}
               className="flex-1 rounded-xl border border-indigo-300 py-2.5 text-sm font-semibold text-indigo-600 dark:border-indigo-700 dark:text-indigo-400 disabled:opacity-60"
             >
-              Buluttaki veriyi kullan
+              {busyAction === 'cloud' ? 'İndiriliyor…' : 'Buluttaki veriyi kullan'}
             </button>
           )}
         </div>
+        {busy && (
+          <p className="text-xs text-slate-400">
+            Veriler senkronize ediliyor, bağlantı hızına göre biraz sürebilir — sayfayı kapatma.
+          </p>
+        )}
         {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
       </Card>
     )
@@ -103,10 +111,10 @@ export function CloudSyncCard({ cloudSync }: { cloudSync: CloudSync }) {
       <button
         type="button"
         disabled={busy}
-        onClick={() => void run(cloudSync.signOut)}
+        onClick={() => void run('signout', cloudSync.signOut)}
         className="w-full rounded-xl border border-slate-300 py-2.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300 disabled:opacity-60"
       >
-        Çıkış yap
+        {busyAction === 'signout' ? 'Çıkış yapılıyor…' : 'Çıkış yap'}
       </button>
       {error && <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>}
     </Card>
