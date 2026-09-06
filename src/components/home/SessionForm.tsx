@@ -297,7 +297,7 @@ export function SessionForm({ books }: SessionFormProps) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Başlangıç saati <span className="font-normal text-zinc-400">(opsiyonel)</span>
+            Başlangıç saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
           </label>
           <input
             type="time"
@@ -308,7 +308,7 @@ export function SessionForm({ books }: SessionFormProps) {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Bitiş saati <span className="font-normal text-zinc-400">(opsiyonel)</span>
+            Bitiş saati <span className="block font-normal text-zinc-400">(opsiyonel)</span>
           </label>
           <input
             type="time"
