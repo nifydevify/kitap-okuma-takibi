@@ -129,14 +129,14 @@ export function SessionForm({ books }: SessionFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="flex rounded-xl bg-slate-100 p-1 dark:bg-slate-700/50">
+      <div className="flex rounded-xl bg-zinc-100 p-1 dark:bg-zinc-700/50">
         <button
           type="button"
           onClick={() => setMode('book')}
           className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
             mode === 'book'
-              ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-800 dark:text-indigo-400'
-              : 'text-slate-500 dark:text-slate-400'
+              ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100'
+              : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           Kitaba bağlı
@@ -146,8 +146,8 @@ export function SessionForm({ books }: SessionFormProps) {
           onClick={() => setMode('free')}
           className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
             mode === 'free'
-              ? 'bg-white text-indigo-600 shadow-sm dark:bg-slate-800 dark:text-indigo-400'
-              : 'text-slate-500 dark:text-slate-400'
+              ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100'
+              : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
           Serbest okuma
@@ -156,18 +156,18 @@ export function SessionForm({ books }: SessionFormProps) {
 
       {mode === 'book' ? (
         books.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Kitaba bağlı kayıt eklemeden önce Kitaplarım sekmesinden bir kitap ekle. Bağımsız bir okuma için
             "Serbest okuma" sekmesini kullanabilirsin.
           </p>
         ) : (
           <>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Kitap</label>
+              <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Kitap</label>
               <select
                 value={bookId}
                 onChange={(e) => handleBookChange(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
               >
                 {books.map((book) => (
                   <option key={book.id} value={book.id}>
@@ -179,7 +179,7 @@ export function SessionForm({ books }: SessionFormProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Başlangıç sayfası
                 </label>
                 <input
@@ -187,11 +187,11 @@ export function SessionForm({ books }: SessionFormProps) {
                   inputMode="numeric"
                   value={startPage}
                   onChange={(e) => setStartPageOverride(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Bitiş sayfası
                 </label>
                 <input
@@ -199,7 +199,7 @@ export function SessionForm({ books }: SessionFormProps) {
                   inputMode="numeric"
                   value={endPage}
                   onChange={(e) => setEndPage(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                   placeholder="ör. 50"
                 />
               </div>
@@ -230,7 +230,7 @@ export function SessionForm({ books }: SessionFormProps) {
           {freeEntryMode === 'range' ? (
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Başlangıç sayfası
                 </label>
                 <input
@@ -238,12 +238,12 @@ export function SessionForm({ books }: SessionFormProps) {
                   inputMode="numeric"
                   value={freeStartPage}
                   onChange={(e) => setFreeStartPage(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                   placeholder="ör. 21"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Bitiş sayfası
                 </label>
                 <input
@@ -251,14 +251,14 @@ export function SessionForm({ books }: SessionFormProps) {
                   inputMode="numeric"
                   value={freeEndPage}
                   onChange={(e) => setFreeEndPage(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                   placeholder="ör. 35"
                 />
               </div>
             </div>
           ) : (
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Kaç sayfa okudun?
               </label>
               <input
@@ -266,7 +266,7 @@ export function SessionForm({ books }: SessionFormProps) {
                 inputMode="numeric"
                 value={freePageCount}
                 onChange={(e) => setFreePageCount(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                 placeholder="ör. 14"
               />
             </div>
@@ -275,19 +275,19 @@ export function SessionForm({ books }: SessionFormProps) {
       )}
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Tarih</label>
+        <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Tarih</label>
         <input
           type="date"
           value={date}
           max={todayDateStr()}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
         />
         {date !== todayDateStr() && (
           <button
             type="button"
             onClick={() => setDate(todayDateStr())}
-            className="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400"
+            className="mt-1 text-xs font-medium text-zinc-900 dark:text-zinc-100"
           >
             Bugüne dön
           </button>
@@ -296,38 +296,38 @@ export function SessionForm({ books }: SessionFormProps) {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Başlangıç saati <span className="font-normal text-slate-400">(opsiyonel)</span>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Başlangıç saati <span className="font-normal text-zinc-400">(opsiyonel)</span>
           </label>
           <input
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Bitiş saati <span className="font-normal text-slate-400">(opsiyonel)</span>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Bitiş saati <span className="font-normal text-zinc-400">(opsiyonel)</span>
           </label>
           <input
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-          Not <span className="font-normal text-slate-400">(opsiyonel)</span>
+        <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Not <span className="font-normal text-zinc-400">(opsiyonel)</span>
         </label>
         <input
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           placeholder={mode === 'free' ? 'ör. Falanca kitaptan' : 'ör. Yirmi Üçüncü Söz'}
         />
       </div>
@@ -338,7 +338,7 @@ export function SessionForm({ books }: SessionFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-xl bg-indigo-600 py-3 text-base font-semibold text-white transition-colors active:bg-indigo-700 disabled:opacity-60"
+          className="w-full rounded-xl bg-zinc-900 py-3 text-base font-semibold text-white transition-colors active:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:active:bg-zinc-300 disabled:opacity-60"
         >
           Kaydet
         </button>

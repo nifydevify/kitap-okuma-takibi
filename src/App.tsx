@@ -40,7 +40,7 @@ function App() {
   }
 
   return (
-    <div className="mx-auto min-h-screen max-w-lg bg-slate-50 pb-20 dark:bg-slate-900">
+    <div className="mx-auto min-h-screen max-w-lg bg-zinc-50 pb-20 dark:bg-zinc-950">
       {content}
       <BottomNav active={tab} onChange={handleTabChange} />
     </div>

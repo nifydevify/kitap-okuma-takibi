@@ -37,22 +37,22 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
 
   return (
     <div className="space-y-4 p-4">
-      <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Ayarlar</h1>
+      <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Ayarlar</h1>
 
       <CloudSyncCard cloudSync={cloudSync} />
 
       <Card>
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-slate-800 dark:text-slate-100">Karanlık mod</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Arayüz temasını değiştir</p>
+            <p className="font-medium text-zinc-800 dark:text-zinc-100">Karanlık mod</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Arayüz temasını değiştir</p>
           </div>
           <button
             type="button"
             role="switch"
             aria-checked={darkMode}
             onClick={() => setDarkMode(!darkMode)}
-            className={`h-7 w-12 rounded-full transition-colors ${darkMode ? 'bg-indigo-600' : 'bg-slate-300'}`}
+            className={`h-7 w-12 rounded-full transition-colors ${darkMode ? 'bg-zinc-900 dark:bg-zinc-100' : 'bg-zinc-300 dark:bg-zinc-700'}`}
           >
             <span
               className={`block h-5 w-5 translate-y-1 rounded-full bg-white transition-transform ${
@@ -65,13 +65,13 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
 
       <Card className="space-y-3">
         <div>
-          <p className="font-medium text-slate-800 dark:text-slate-100">Veriyi dışa aktar</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tüm kitap ve kayıtları JSON dosyası olarak indir</p>
+          <p className="font-medium text-zinc-800 dark:text-zinc-100">Veriyi dışa aktar</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Tüm kitap ve kayıtları JSON dosyası olarak indir</p>
         </div>
         <button
           type="button"
           onClick={() => void downloadBackup()}
-          className="w-full rounded-xl border border-indigo-300 py-2.5 text-sm font-semibold text-indigo-600 dark:border-indigo-700 dark:text-indigo-400"
+          className="w-full rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
         >
           JSON olarak indir
         </button>
@@ -79,8 +79,8 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
 
       <Card className="space-y-3">
         <div>
-          <p className="font-medium text-slate-800 dark:text-slate-100">Veriyi içe aktar</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="font-medium text-zinc-800 dark:text-zinc-100">Veriyi içe aktar</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Bir yedek dosyası seç; mevcut verinle birleştirilir, üzerine yazılmaz.
           </p>
         </div>
@@ -88,7 +88,7 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full rounded-xl border border-indigo-300 py-2.5 text-sm font-semibold text-indigo-600 dark:border-indigo-700 dark:text-indigo-400"
+          className="w-full rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-900 dark:border-zinc-600 dark:text-zinc-100"
         >
           Dosya seç
         </button>
@@ -98,8 +98,8 @@ export function Settings({ cloudSync }: { cloudSync: CloudSync }) {
 
       <Card className="space-y-3">
         <div>
-          <p className="font-medium text-slate-800 dark:text-slate-100">Tüm veriyi sıfırla</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tüm kitaplar ve kayıtlar kalıcı olarak silinir.</p>
+          <p className="font-medium text-zinc-800 dark:text-zinc-100">Tüm veriyi sıfırla</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Tüm kitaplar ve kayıtlar kalıcı olarak silinir.</p>
         </div>
         <button
           type="button"

@@ -12,7 +12,7 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
   const [editingId, setEditingId] = useState<number | null>(null)
 
   if (sessions.length === 0) {
-    return <p className="text-sm text-slate-500 dark:text-slate-400">Bugün henüz kayıt yok.</p>
+    return <p className="text-sm text-zinc-500 dark:text-zinc-400">Bugün henüz kayıt yok.</p>
   }
 
   return (
@@ -26,7 +26,7 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
         ) : (
           <li
             key={session.id}
-            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-800"
+            className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
           >
             <span
               className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -34,24 +34,24 @@ export function TodaySessionList({ sessions, books }: TodaySessionListProps) {
               aria-hidden
             />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
+              <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
                 {book?.name ?? 'Serbest okuma'}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 {book
                   ? `${session.startPage} → ${session.endPage} · ${session.pagesRead} sayfa`
                   : `${session.pagesRead} sayfa`}
                 {session.startTime ? ` · ${session.startTime}${session.endTime ? `–${session.endTime}` : ''}` : ''}
               </p>
               {session.note && (
-                <p className="mt-0.5 truncate text-xs italic text-slate-400 dark:text-slate-500">{session.note}</p>
+                <p className="mt-0.5 truncate text-xs italic text-zinc-400 dark:text-zinc-500">{session.note}</p>
               )}
             </div>
             <div className="flex shrink-0 gap-1">
               <button
                 type="button"
                 onClick={() => setEditingId(session.id)}
-                className="rounded-lg px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950"
+                className="rounded-lg px-2 py-1 text-xs font-medium text-zinc-900 hover:bg-zinc-100 dark:text-zinc-100 dark:hover:bg-zinc-800"
               >
                 Düzenle
               </button>

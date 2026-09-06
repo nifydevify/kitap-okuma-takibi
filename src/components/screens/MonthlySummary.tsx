@@ -53,16 +53,16 @@ export function MonthlySummary() {
         <button
           type="button"
           onClick={() => setMonthKey((m) => shiftMonthKey(m, -1))}
-          className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300"
+          className="rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300"
           aria-label="Önceki ay"
         >
           ←
         </button>
-        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{monthKeyLabel(monthKey)}</h1>
+        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{monthKeyLabel(monthKey)}</h1>
         <button
           type="button"
           onClick={() => setMonthKey((m) => shiftMonthKey(m, 1))}
-          className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300"
+          className="rounded-full border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300"
           aria-label="Sonraki ay"
         >
           →
@@ -70,23 +70,25 @@ export function MonthlySummary() {
       </div>
 
       <Card className="text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Bu ay toplam sayfa</p>
-        <p className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">{totalPages}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500">
+          Bu ay toplam sayfa
+        </p>
+        <p className="font-display text-5xl font-semibold text-amber-600 dark:text-amber-400">{totalPages}</p>
       </Card>
 
       <Card>
-        <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">Günlük dağılım</h2>
+        <h2 className="mb-3 text-base font-semibold text-zinc-800 dark:text-zinc-100">Günlük dağılım</h2>
         {totalPages === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Bu ay için kayıt yok.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Bu ay için kayıt yok.</p>
         ) : (
           <div className="-ml-2 h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-zinc-200 dark:stroke-zinc-700" />
                 <XAxis dataKey="label" tick={{ fontSize: 10 }} interval={Math.ceil(chartData.length / 8)} />
                 <YAxis tick={{ fontSize: 10 }} allowDecimals={false} width={28} />
                 <Tooltip formatter={(value) => [`${value} sayfa`, 'Okunan']} labelFormatter={(label) => label} />
-                <Bar dataKey="pages" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="pages" fill="#18181b" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -94,13 +96,13 @@ export function MonthlySummary() {
       </Card>
 
       <Card>
-        <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">Kitap bazlı kırılım</h2>
+        <h2 className="mb-3 text-base font-semibold text-zinc-800 dark:text-zinc-100">Kitap bazlı kırılım</h2>
         {perBook.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Bu ay için kayıt yok.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Bu ay için kayıt yok.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
+              <tr className="text-left text-xs uppercase tracking-wide text-zinc-400">
                 <th className="pb-2 font-medium">Kitap</th>
                 <th className="pb-2 text-right font-medium">Sayfa</th>
                 <th className="pb-2 text-right font-medium">%</th>
@@ -108,16 +110,16 @@ export function MonthlySummary() {
             </thead>
             <tbody>
               {perBook.map(({ book, pages }) => (
-                <tr key={book?.id ?? 'free'} className="border-t border-slate-100 dark:border-slate-700">
-                  <td className="flex items-center gap-2 py-2 text-slate-700 dark:text-slate-200">
+                <tr key={book?.id ?? 'free'} className="border-t border-zinc-100 dark:border-zinc-700">
+                  <td className="flex items-center gap-2 py-2 text-zinc-700 dark:text-zinc-200">
                     <span
                       className="h-2 w-2 shrink-0 rounded-full"
                       style={{ backgroundColor: book?.color ?? '#64748b' }}
                     />
                     {book?.name ?? 'Serbest okuma'}
                   </td>
-                  <td className="py-2 text-right text-slate-700 dark:text-slate-200">{pages}</td>
-                  <td className="py-2 text-right text-slate-500 dark:text-slate-400">
+                  <td className="py-2 text-right text-zinc-700 dark:text-zinc-200">{pages}</td>
+                  <td className="py-2 text-right text-zinc-500 dark:text-zinc-400">
                     {book && book.effectivePages > 0 ? `%${((pages / book.effectivePages) * 100).toFixed(1)}` : '—'}
                   </td>
                 </tr>
@@ -128,15 +130,15 @@ export function MonthlySummary() {
       </Card>
 
       <Card>
-        <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">Gün gün liste</h2>
+        <h2 className="mb-3 text-base font-semibold text-zinc-800 dark:text-zinc-100">Gün gün liste</h2>
         {dailyTotals.length === 0 ? (
-          <p className="text-sm text-slate-500 dark:text-slate-400">Bu ay için kayıt yok.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Bu ay için kayıt yok.</p>
         ) : (
-          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
             {dailyTotals.map((day) => (
               <li key={day.date} className="flex items-center justify-between py-2 text-sm">
-                <span className="text-slate-600 dark:text-slate-300">{shortDateLabel(day.date)}</span>
-                <span className="font-medium text-slate-800 dark:text-slate-100">{day.pages} sayfa</span>
+                <span className="text-zinc-600 dark:text-zinc-300">{shortDateLabel(day.date)}</span>
+                <span className="font-medium text-zinc-800 dark:text-zinc-100">{day.pages} sayfa</span>
               </li>
             ))}
           </ul>

@@ -29,12 +29,12 @@ export function MyBooks({ onOpenBook }: MyBooksProps) {
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Kitaplarım</h1>
+        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Kitaplarım</h1>
         {formMode === 'closed' && (
           <button
             type="button"
             onClick={() => setFormMode('add')}
-            className="rounded-xl bg-indigo-600 px-3 py-2 text-sm font-semibold text-white"
+            className="rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
           >
             + Yeni Kitap
           </button>
@@ -43,14 +43,14 @@ export function MyBooks({ onOpenBook }: MyBooksProps) {
 
       {formMode === 'add' && (
         <Card>
-          <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">Yeni kitap</h2>
+          <h2 className="mb-3 text-base font-semibold text-zinc-800 dark:text-zinc-100">Yeni kitap</h2>
           <BookForm onDone={() => setFormMode('closed')} />
         </Card>
       )}
 
       {editingBook && (
         <Card>
-          <h2 className="mb-3 text-base font-semibold text-slate-800 dark:text-slate-100">Kitabı düzenle</h2>
+          <h2 className="mb-3 text-base font-semibold text-zinc-800 dark:text-zinc-100">Kitabı düzenle</h2>
           <BookForm book={editingBook} onDone={() => setFormMode('closed')} />
         </Card>
       )}

@@ -82,18 +82,18 @@ export function BookForm({ book, onDone }: BookFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Kitap adı</label>
+        <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Kitap adı</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Başlangıç sayfası
           </label>
           <input
@@ -101,12 +101,12 @@ export function BookForm({ book, onDone }: BookFormProps) {
             inputMode="numeric"
             value={startPage}
             onChange={(e) => setStartPage(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
-          <p className="mt-1 text-xs text-slate-400">Önsöz/giriş varsa asıl metnin başladığı sayfa</p>
+          <p className="mt-1 text-xs text-zinc-400">Önsöz/giriş varsa asıl metnin başladığı sayfa</p>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Bitiş sayfası
           </label>
           <input
@@ -114,21 +114,21 @@ export function BookForm({ book, onDone }: BookFormProps) {
             inputMode="numeric"
             value={endPage}
             onChange={(e) => setEndPage(e.target.value)}
-            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-base dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
-          <p className="mt-1 text-xs text-slate-400">Kitabın bittiği son sayfa</p>
+          <p className="mt-1 text-xs text-zinc-400">Kitabın bittiği son sayfa</p>
         </div>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">Renk</label>
+        <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Renk</label>
         <div className="flex flex-wrap gap-2">
           {COLOR_OPTIONS.map((c) => (
             <button
               key={c}
               type="button"
               onClick={() => setColor(c)}
-              className={`h-8 w-8 rounded-full ring-offset-2 ${color === c ? 'ring-2 ring-slate-800 dark:ring-white' : ''}`}
+              className={`h-8 w-8 rounded-full ring-offset-2 ${color === c ? 'ring-2 ring-zinc-800 dark:ring-white' : ''}`}
               style={{ backgroundColor: c }}
               aria-label={c}
             />
@@ -142,14 +142,14 @@ export function BookForm({ book, onDone }: BookFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="flex-1 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+          className="flex-1 rounded-xl bg-zinc-900 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900 disabled:opacity-60"
         >
           {book ? 'Güncelle' : 'Ekle'}
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="flex-1 rounded-xl border border-slate-300 py-2.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300"
+          className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300"
         >
           İptal
         </button>

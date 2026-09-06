@@ -50,15 +50,15 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
   }
 
   return (
-    <li className="space-y-2 rounded-xl border border-indigo-300 bg-indigo-50 p-3 dark:border-indigo-700 dark:bg-indigo-950">
-      <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{book?.name ?? 'Serbest okuma'}</p>
+    <li className="space-y-2 rounded-xl border border-amber-300/60 bg-amber-50 p-3 dark:border-amber-800/60 dark:bg-amber-950/30">
+      <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">{book?.name ?? 'Serbest okuma'}</p>
       {showDate && (
         <input
           type="date"
           value={date}
           max={todayDateStr()}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
         />
       )}
       {book ? (
@@ -67,13 +67,13 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
             type="number"
             value={startPage}
             onChange={(e) => setStartPage(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
           <input
             type="number"
             value={endPage}
             onChange={(e) => setEndPage(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+            className="rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           />
         </div>
       ) : (
@@ -82,7 +82,7 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
           value={pageCount}
           onChange={(e) => setPageCount(e.target.value)}
           placeholder="Kaç sayfa"
-          className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+          className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
         />
       )}
       <input
@@ -90,21 +90,21 @@ export function SessionEditRow({ session, book, onDone, showDate = false }: Sess
         value={note}
         onChange={(e) => setNote(e.target.value)}
         placeholder="Not"
-        className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+        className="w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
       />
       {error && <p className="text-xs font-medium text-red-600 dark:text-red-400">{error}</p>}
       <div className="flex gap-2">
         <button
           type="button"
           onClick={handleSave}
-          className="flex-1 rounded-lg bg-indigo-600 py-1.5 text-sm font-semibold text-white"
+          className="flex-1 rounded-lg bg-zinc-900 py-1.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
         >
           Kaydet
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="flex-1 rounded-lg border border-slate-300 py-1.5 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300"
+          className="flex-1 rounded-lg border border-zinc-300 py-1.5 text-sm font-medium text-zinc-600 dark:border-zinc-600 dark:text-zinc-300"
         >
           İptal
         </button>
